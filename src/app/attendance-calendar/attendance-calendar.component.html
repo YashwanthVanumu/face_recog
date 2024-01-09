@@ -1,0 +1,198 @@
+<!-- <p>calendar-details works!</p> -->
+<body>
+  <nav>
+    <div class="nav-left">
+      <!-- <img [src]="image" alt="Logo" class="logo2"> -->
+  </div>
+  <ul>
+    <li><a  (click)="showNotification()"><img [src]="boy_icon" alt="Photo Icon" class="nav-icon">
+      </a></li>
+     
+    
+    
+    <!-- <li><a routerLink="/login">Logout</a></li> -->
+  </ul>
+</nav>
+    <div class="admin-container" id="admin-details">
+  
+    <p id="adminname">Employee</p>
+    <p id="adminemail">Employee@gmail.com</p>
+    <p id="adminemail">ID: 23456789</p>
+
+  
+    <span class="Logout" (click)="onsave2()">Logout</span>
+      
+      <!-- <span class="close-button" (click)="hideNotification()">✖</span> -->
+    </div>
+
+    <div class="user-info">
+      <h2>{{ emp_name }}</h2>
+    </div>
+
+    <div class="total">
+      <div>
+        <mat-form-field color="warn">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date">
+            <input matEndDate placeholder="End date">
+          </mat-date-range-input>
+          <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker>
+          <mat-datepicker-actions>
+            <button mat-button matDatepickerCancel>Cancel</button>
+            <button mat-raised-button color="primary" matDatepickerApply>Apply</button>
+          </mat-datepicker-actions>
+        </mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    <div class="calendar">
+      <div class="day">
+        <span class="day-name">Mon</span><br>
+        <span class="attendance present">Present</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Tue</span><br>
+        <span class="attendance absent">Absent</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Wed</span><br>
+        <span class="attendance present">Present</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Thu</span><br>
+        <span class="attendance absent">Absent</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Fri</span><br>
+        <span class="attendance present">Present</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Sat</span><br>
+        <span class="attendance">----</span>
+      </div>
+      <div class="day">
+        <span class="day-name">Sun</span><br>
+        <span class="attendance">----</span>
+      </div>
+  
+      
+  
+    </div>
+</div>
+<!-- <ng-template #customCell let-day="day" let-locale="locale">
+  <div class="cell" [ngClass]="{ 'is-past': day.isPast, 'is-today': day.isToday, 'is-future': day.isFuture }">
+    {{ day.day }}
+  </div>
+</ng-template>
+
+<mwl-calendar-month-view
+  [viewDate]="viewDate"
+  [events]="events"
+  [view]="view"
+  (dayClicked)="dayClicked($event)"
+  [cellTemplate]="customCell"
+></mwl-calendar-month-view> -->
+
+<!-- <mwl-demo-utils-calendar-header
+  [(view)]="view"
+  [(viewDate)]="viewDate"
+  (viewDateChange)="fetchEvents()"
+  (viewChange)="fetchEvents()"
+>
+</mwl-demo-utils-calendar-header> -->
+
+
+
+<!-- <ng-template #loading>
+  <div class="text-center">
+    <i class="fas fa-spin fa-spinner fa-5x"></i> <br />
+    Loading events...
+  </div>
+</ng-template>
+
+<div *ngIf="events$ | async; else loading; let events">
+  <div [ngSwitch]="view">
+    <mwl-calendar-month-view
+      *ngSwitchCase="'month'"
+      [viewDate]="viewDate"
+      [events]="events"
+      [activeDayIsOpen]="activeDayIsOpen"
+      (dayClicked)="dayClicked($event.day)"
+      (eventClicked)="eventClicked($event.event)"
+    >
+    </mwl-calendar-month-view>
+    <mwl-calendar-week-view
+      *ngSwitchCase="'week'"
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="eventClicked($event.event)"
+    >
+    </mwl-calendar-week-view>
+    <mwl-calendar-day-view
+      *ngSwitchCase="'day'"
+      [viewDate]="viewDate"
+      [events]="events"
+      (eventClicked)="eventClicked($event.event)"
+    >
+    </mwl-calendar-day-view>
+  </div>
+</div> -->
+
+
+<!-- <div>
+  <mwl-calendar-month-view
+    [viewDate]="viewDate"
+    [events]="events"
+    [refresh]="refresh"
+  ></mwl-calendar-month-view>
+</div> -->
+
+<app-demo-utils [(view)]="view" [(viewDate)]="viewDate">
+</app-demo-utils>
+
+<!-- <div class="text-center">
+  <button class="btn btn-primary" (click)="refreshView()">
+    Refresh + re-render the current view
+  </button>
+</div> -->
+<!-- <ng-template #customCellTemplate let-day="day" let-locale="locale">
+  <div class="cal-cell-top">
+    <span class="cal-day-badge" *ngIf="day.badgeTotal > 0"
+      >{{ day.badgeTotal }}</span
+    >
+    <span class="cal-day-number"
+      >{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span
+    >
+  </div>
+  <small style="margin: 5px"
+    >There are {{ day.events.length }} events on this day</small
+  >
+</ng-template> -->
+
+<div [ngSwitch]="view" class="Calendar h-100 w-75">
+  <mwl-calendar-month-view
+    *ngSwitchCase="'month'"
+    [viewDate]="viewDate"
+    [events]="events"
+    [refresh]="refresh"
+    (beforeViewRender)="beforeMonthViewRender($event)"
+  >
+  </mwl-calendar-month-view>
+  <mwl-calendar-week-view
+    *ngSwitchCase="'week'"
+    [viewDate]="viewDate"
+    [events]="events"
+  >
+  </mwl-calendar-week-view>
+  <mwl-calendar-day-view
+    *ngSwitchCase="'day'"
+    [viewDate]="viewDate"
+    [events]="events"
+  >
+  </mwl-calendar-day-view>
+</div>
+
+  
+  </body>

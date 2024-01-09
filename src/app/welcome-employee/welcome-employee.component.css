@@ -1,0 +1,107 @@
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+  background-image: url("/assets/astreya_background.png");
+  height: 100vh;
+}
+nav {
+  /* background-color: #f0eaea; */
+  padding: 15px;
+  display: flex;
+  gap: 75rem;
+
+}
+.nav-icon{
+
+  width: 25px;
+    height: 25px;
+}
+
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 35px;
+  overflow: hidden;
+}
+
+li {
+  float: left;
+  margin-right: 20px;
+}
+
+a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.employee-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+}
+
+h2 {
+  color: #333;
+}
+
+.options {
+  margin-top: 20px;
+}
+
+.options a {
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #ff8001;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.options a:hover {
+  background-color: #333;
+}
+.admin-container {
+
+
+top: 250px;
+right: 250px;
+background-color: rgb(0, 136, 0);
+color: #fff;
+padding: 10px;
+display: none;
+width: 170px;
+position: fixed;
+font-family: Arial, sans-serif;
+border-radius: 10px;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.options button{
+display: block;
+width: 23.5vw;
+margin-bottom: 10px;
+padding: 10px;
+background-color: #ff8001;
+color: #fff;
+text-decoration: none;
+border-radius: 5px;
+border-color: #ff8001;
+transition: background-color 0.3s ease;
+}
+
+.options button:hover {
+background-color: #333;
+}

@@ -1,0 +1,53 @@
+<body>
+
+  <!-- <div class="header">
+    <h3>Welcome Admin</h3>
+  </div> -->
+  <nav>
+    <div class="nav-left">
+        <!-- <img [src]="image" alt="Logo" class="logo2"> -->
+    </div>
+    <ul>
+      <li><a routerLink="/notification"[innerHTML]="bell_icon"alt="Photo Icon" class="nav-icon"></a></li>
+      <li><a [routerLink]="['/notification', employees]">View</a><img [src]="boy_icon" alt="Photo Icon" class="nav-icon">
+        </li>
+
+
+
+      <!-- <li><a routerLink="/login">Logout</a></li> -->
+    </ul>
+  </nav>
+  <div class="admin-container" id="admin-details">
+
+    <p id="adminname">Admin</p>
+    <p id="adminemail">admin</p>
+    <p id="adminemail">ID: 23456789</p>
+
+
+    <span class="Logout" (click)="onsave1()">Logout</span>
+
+  </div>
+
+  <div class="admin-welcome">
+    <!-- <span class="notification-icon" [innerHTML]="bell_icon"(click)="onsave()"></span> -->
+    <span>Welcome, Admin!</span>
+  </div>
+
+  <div class="content">
+    <button class="view-users-button"(click)="onsave2()">View Users</button>
+
+  </div>
+  <div class="content">
+    <button class="view-users-button"(click)="onsave3()">User List Attendance</button>
+
+  </div>
+  <div class="content">
+    <button class="view-users-button"(click)="onsave4()">Mark attendance</button>
+
+  </div>
+  <div class="content1">
+    <button class="logout"(click)="onsave1()">Logout</button>
+
+  </div>
+
+</body>

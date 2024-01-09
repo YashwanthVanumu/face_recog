@@ -1,0 +1,38 @@
+<body>
+  <nav>
+      <div class="nav-left">
+          <!-- <img [src]="image" alt="Logo" class="logo2"> -->
+       </div>
+      <ul>
+        <li><a (click)="showadmindetails()"><img [src]="boy_icon" alt="Photo Icon" class="nav-icon">
+          </a></li>
+
+
+        <li><a routerLink="/login">Logout</a></li>
+      </ul>
+     </nav>
+     <div class="admin-container" id="admin-details">
+
+      <p id="adminname">Admin</p>
+      <p id="adminemail">admin@gmail.com</p>
+      <span class="close-button" (click)="hideNotification()">✖</span>
+    </div>
+  <div class="user-card">
+      <div class="user-icon">
+
+          <img [src]="girl_icon" alt="User Icon">
+
+      </div>
+      <p class="info"><I><span class="name">Hello {{emp_name}}!! </span></I></p>
+
+      <div class="user-details">
+
+          <p class="info"><span>Name</span> = {{emp_name}}</p>
+          <p class="info"><span>Job</span> = <span class="status">{{job}}</span></p>
+          <p class="info"><span>Gender</span> = {{gender}}</p>
+          <p class="info"><span>ID</span> = {{emp_id}}</p>
+          <p class="info"><span>email</span> = {{email}}</p>
+          <button type="submit"(click)="onsave()">Logout</button>
+      </div>
+  </div>
+</body>

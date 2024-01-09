@@ -1,0 +1,56 @@
+<body>
+  <nav>
+    <div class="nav-left">
+        <!-- <img [src]="image" alt="Logo" class="logo2"> -->
+    </div>
+    <ul>
+      <li><a (click)="showadmindetails()"><img [src]="boy_icon" alt="Photo Icon" class="nav-icon">
+        </a></li>
+
+
+      <li><a routerLink="/login">Logout</a></li>
+    </ul>
+  </nav>
+  <div class="admin-container" id="admin-details">
+
+    <p id="adminname">Admin</p>
+    <p id="adminemail">admin@gmail.com</p>
+    <span class="close-button" (click)="hideNotification()">✖</span>
+  </div>
+
+  <div class="container" >
+    <div class="attendance-status">
+    <h2>Attendance Status</h2></div>
+
+    <div class="user-status" *ngFor = "let attendance of attendances">
+      <span class="user-name"(click)="onsave()">{{attendance.emp_name}}</span>
+      <div class="present">{{attendance.status}}</div>
+    </div>
+
+    <div class="user-status">
+      <span class="user-name">Muskan Sahu</span>
+      <div class="absent">Absent</div>
+    </div>
+
+    <div class="user-status">
+      <span class="user-name">Trishita Das</span>
+      <div class="present">Present</div>
+    </div>
+
+    <div class="user-status">
+      <span class="user-name">Payal Agarwal</span>
+      <div class="absent">Absent</div>
+    </div>
+
+    <div class="user-status">
+      <span class="user-name">Sadia Naz</span>
+      <div class="present">Present</div>
+    </div>
+
+
+
+  </div>
+
+</body>
+
+
