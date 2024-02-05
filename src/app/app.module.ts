@@ -45,7 +45,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { ThankYouComponent } from './thank-you/thank-you.component';
 import { MarkAttendanceFormComponent } from './mark-attendance-form/mark-attendance-form.component';
 import { MarkLeaveComponent } from './mark-leave/mark-leave.component';
-
+import { AbsenceComponent } from './absence/absence.component';
+import { AdduserFormComponent } from './adduser-form/adduser-form.component';
+import { EditDetailsComponent } from './edit-details/edit-details.component';
+import { ShowimageComponent } from './showimage/showimage.component';
 
 
 
@@ -80,6 +83,10 @@ import { MarkLeaveComponent } from './mark-leave/mark-leave.component';
                       ThankYouComponent,
                       MarkAttendanceFormComponent,
                       MarkLeaveComponent,
+                      AbsenceComponent,
+                      AdduserFormComponent,
+                      EditDetailsComponent,
+                      ShowimageComponent,
     
     
    

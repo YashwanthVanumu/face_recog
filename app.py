@@ -9,6 +9,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS,cross_origin
 from flask_bcrypt import Bcrypt
 from sqlalchemy import event
+from detection import real_time_face_detection, face_match
+import os
 
 
 
@@ -70,28 +72,39 @@ class Admin(db.Model):
         cursor = db_handler.get_cursor()
 
         # Use the cursor for database operations
-        cursor.execute("select * from admin where username = %s",(username,))
+        cursor.execute("select id from admin where username = %s",(username,))
         result = cursor.fetchall()
 
         # Close the connection when done
         db_handler.close_connection()
 
-        return list(result)
+        return result
 
 
 
 class User(db.Model):
 
 
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    emp_id = db.Column(db.String(100), primary_key=True)
+    emp_name = db.Column(db.String(80), unique=True, nullable=False)
+    job_position = db.Column(db.String(50),nullable = False)
+    email = db.Column(db.String(100))
+    # gender = db.Column(db.String(100))
+    # age = db.Column(db.Integer)
+    role = db.Column(db.String(120),nullable=False)
+    contact_no = db.Column(db.String(120), unique=True, nullable=False)
+
 
     def serialize(self):
         return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email
+            'emp_id': self.emp_id,
+            'emp_name': self.emp_name,
+            'job_position':self.job_position,
+            'email':self.email,
+            # 'gender':self.gender,
+            # 'age':self.age,
+            'role': self.role,
+            'contact_no': self.contact_no
         }
 
 @app.route('/users', methods=['GET'])
@@ -99,7 +112,8 @@ class User(db.Model):
 def get_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users])
-
+@app.route('/users/<string:user_id>',methods = ['GET'])
+@cross_origin()
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
     return jsonify(user.serialize())
@@ -109,7 +123,14 @@ def get_user(user_id):
 @cross_origin()
 def create_user():
     data = request.get_json()
-    new_user = User(username=data['username'], email=data['email'])
+    new_user = User(emp_id = data['emp_id'],
+                    emp_name=data['emp_name'],
+                    job_position = data['job_position'],
+                    email = data['email'],
+                    # gender = data['gender'],
+                    # age = data['age'],
+                    role = data['role'],
+                    contact_no=data['contact_no'])
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created successfully'}), 201
@@ -152,6 +173,8 @@ def authenticate():
     admin = Admin.query.filter_by(username=username).first()
 
     if admin and admin.check_password(password):
+        print("Details are correct")
+        # return
         return admin.admin_id(username)
     else:
         return jsonify({'error': 'Invalid username or password'}), 401
@@ -203,26 +226,28 @@ class MySQLHandler:
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    emp_id = db.Column(db.Integer, unique=True, nullable=False)
+    emp_id = db.Column(db.String(100), unique=True, nullable=False)
     emp_name = db.Column(db.String(100), nullable=False)
     job_position = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
+    # gender = db.Column(db.String(10), nullable=False)
+    # age = db.Column(db.Integer, nullable=False)
+    role = db.Column(db.String(20),nullable=False)
     contact_no = db.Column(db.String(15), nullable=False)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+    # username = db.Column(db.String(20), unique=True, nullable=True)
+    # password = db.Column(db.String(60), nullable=True)
 
-    def __init__(self, emp_id, emp_name, job_position, email, gender, age, contact_no, username, password):
+    def __init__(self, emp_id, emp_name, job_position, email, role, contact_no):
         self.emp_id = emp_id
         self.emp_name = emp_name
         self.job_position = job_position
         self.email = email
-        self.gender = gender
-        self.age = age
+        # self.gender = gender
+        # self.age = age
+        self.role = role
         self.contact_no = contact_no
-        self.username = username
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # self.username = username
+        # self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
 
     def set_password(self, password):
@@ -239,11 +264,12 @@ class Employee(db.Model):
             'emp_name': self.emp_name,
             'job_position': self.job_position,
             'email': self.email,
-            'gender': self.gender,
-            'age': self.age,
+            # 'gender': self.gender,
+            # 'age': self.age,
+            'role':self.role,
             'contact_no': self.contact_no,
-            'username': self.username,
-            'password': self.password  # Note: This exposes the hashed password, which may not be suitable in a real-world scenario
+            # 'username': self.username,
+            # 'password': self.password  # Note: This exposes the hashed password, which may not be suitable in a real-world scenario
         }
     def to_empname(self):
         return{
@@ -272,15 +298,13 @@ class Employee(db.Model):
         cursor = db_handler.get_cursor()
 
         # Use the cursor for database operations
-        cursor.execute("select * from employee where username = %s",(username,))
+        cursor.execute("select emp_id from employee where username = %s",(username,))
         results = cursor.fetchall()
 
         # Close the connection when done
         db_handler.close_connection()
 
-        return list(results)
-
-
+        return results
 
 
 
@@ -305,8 +329,9 @@ def get_employee(emp_id):
         'emp_name': employees.emp_name,
         'job_position': employees.job_position,
         'email': employees.email,
-        'gender': employees.gender,
-        'age': employees.age,
+        # 'gender': employees.gender,
+        # 'age': employees.age,
+        'role':employees.role,
         'contact_no': employees.contact_no,
         'username': employees.username,
         'password': employees.password,
@@ -325,11 +350,12 @@ def add_employee():
         emp_name=data['emp_name'],
         job_position=data['job_position'],
         email=data['email'],
-        gender=data['gender'],
-        age=data['age'],
+        # gender=data['gender'],
+        # age=data['age'],
+        role=data['role'],
         contact_no=data['contact_no'],
-        username=data['username'],
-        password=data['password']
+        # username=data['username'],
+        # password=data['password']
     )
 
 
@@ -376,7 +402,7 @@ def delete_employee(emp_id):
 
 class Request(db.Model):
     request_id = db.Column(db.Integer, primary_key=True,autoincrement = True)
-    emp_id = db.Column(db.String(20), unique=False, nullable=False)
+    emp_id = db.Column(db.String(100), unique=False, nullable=False)
     emp_name = db.Column(db.String(100), nullable=False)
     request_status = db.Column(db.String(20),default = "pending",nullable = False)
     request_time = db.Column(db.DateTime, nullable = False,default = datetime.utcnow)
@@ -505,13 +531,14 @@ def del_request(requestId):
     return jsonify({'message': 'Employee deleted successfully'})
 class Absence(db.Model):
     leave_id = db.Column(db.Integer,primary_key = True,autoincrement = True)
-    emp_id = db.Column(db.Integer, unique=False, nullable=False)
+    emp_id = db.Column(db.String(100), unique=False, nullable=False)
     emp_name = db.Column(db.String(100), nullable=False)
     date_from = db.Column(db.DateTime,nullable = False)
     date_to =db.Column(db.DateTime)
     contact_no = db.Column(db.String(100),nullable = False)
     email = db.Column(db.String(100),nullable = False)
     leave_status = db.Column(db.String(100),nullable = False,default = 'No')
+    approved_by = db.Column(db.String(100),nullable = False)
 
     def serialize(self):
         return {
@@ -558,8 +585,8 @@ def get_absence(leave_id):
 
 class Attendance(db.Model):
     attendance_id = db.Column(db.Integer, primary_key=True)
-    emp_id = db.Column(db.Integer,nullable = False)
-    emp_name = db.Column(db.String(100), nullable=False)
+    emp_id = db.Column(db.String(100),nullable = False)
+    # emp_name = db.Column(db.String(100), nullable=False)
     entry_time = db.Column(db.DateTime,nullable = True)
     exit_time = db.Column(db.DateTime,nullable = True)
     date = db.Column(db.Date, default=lambda: datetime.utcnow().date())
@@ -577,6 +604,7 @@ class Attendance(db.Model):
         today_record = Attendance.query.filter_by(emp_id=self.emp_id, date=current_time.date()).first()
         if emp_exists:
           if today_record:
+
               # Update the exit time for the existing record
               today_record.exit_time = current_time
               today_record.duration = today_record.exit_time - today_record.entry_time
@@ -607,50 +635,46 @@ class Attendance(db.Model):
 @app.route('/attendance', methods=['POST'])
 def mark_entry_exit():
     current_time = datetime.utcnow()
-    data = request.json
-    employee_id = data.get('emp_id')
-    employee_name = data.get('emp_name')
-    status = data.get('status')
+    # data = request.json
+    employee_id,image_path = real_time_face_detection()
+    # employee_name = data.get('emp_name')
+    # status = data.get('status')
+    print("employee_id is ---------------- ",employee_id)
 
 
-    if employee_id is None and employee_name is None:
+
+    if employee_id is None:
         return jsonify({'messsage': 'emp_id and emp_name are required'}), 400
+    if employee_id == 'Unknown':
+        print("Inside if employee_id is unknown -------------------")
+        return({'message':'Employee not found','image_path':image_path})
 
     emp_exists = Employee.query.filter_by(emp_id = employee_id).first()
     today_record = Attendance.query.filter_by(emp_id=employee_id,date=current_time.date() ).first()
 
 
 
-    attendance_entry_exit = Attendance(emp_id=employee_id, emp_name=employee_name)
+    attendance_entry_exit = Attendance(emp_id=employee_id)
     attendance_entry_exit.mark_entry_exit()
     if emp_exists:
         if  today_record:
-            today_record.status = "status"
+            # today_record.status = status
+
             db.session.commit()
-            return({'message':'Your exit time has been updated'})
+            return({'message':'Your exit time has been updated','image_path':image_path})
 
         else:
-            return({'message':'Your attendance has been marked'})
+
+            return({'message':'Your attendance has been marked','image_path':image_path})
 
     else:
-        return({'error':'Employee not found'})
+        return({'message':'Employee not found','image_path':image_path})
 
     # return jsonify({'message': 'Entry/Exit marked successfully'}), 200
 
-@app.route('/attendance',methods=['POST'])
-@cross_origin()
-def post_attendance():
-    data = request.get_json()
-    new_attendance = Attendance(
-            emp_id=data['emp_id'],
-            emp_name=data['emp_name'],
-            status=data['status']
-        )
 
-    db.session.add(new_attendance)
-    db.session.commit()
 
-    return jsonify({'message': 'Attendance record created successfully'}), 201
+
 
 
 # @app.route('/attendance', methods=['PUT'])
@@ -671,24 +695,200 @@ def get_attendance():
     return jsonify([attendance.serialize() for attendance in attendances])
 
 
-@app.route('/attendance/<int:emp_id>',methods=['GET'])
+def to_empname(self):
+        return{
+            self.emp_name.value,
+
+        }
+
+UPLOAD_FOLDER = 'C:/Users/YashwanthSaiRamVanum/Pictures/Face-Recognition-frontend/src/assets/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/attendance/upload_image', methods=['POST'])
 @cross_origin()
-def get_attendance_by_id(emp_id):
-    current_date = datetime.utcnow().date
-    attendances = Attendance.query.filter_by(emp_id= emp_id).all()
-    data = [{
-            'attendance_id':attendance.attendance_id,
-            'emp_id':attendance.emp_id,
-            'emp_name':attendance.emp_name,
-            'date':attendance.date,
-            'status':attendance.status
-        } for attendance in attendances]
-    return data
+def upload_image():
+    # employee_id = real_time_face_detection()
+    if 'image' not in request.files:
+        return jsonify({'message': 'No image received'}), 400
+
+    image = request.files['image']
+
+
+    print("image is :::::::::::::",image)
+
+    if image.filename == '':
+        return jsonify({'message': 'No selected file'}), 400
+
+    if image and allowed_file(image.filename):
+        image_data = image.read()
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], 'captured_image.jpg')
+        with open(image_path, 'wb') as f:
+            f.write(image_data)
+            # employee_id =  face_match('C:/Users/SahithReddy/Desktop/python/src/assets/captured_image.jpg','C:/Users/SahithReddy/Desktop/python/data.pt')
+            # employee_id = real_time_face_detection()
+            # print(employee_id)
+            # if employee_id is None:
+            #   return jsonify({'messsage': 'emp_id and emp_name are required'}), 400
+            # if employee_id == 'Unknown':
+            #   print("Inside if employee_id is unknown -------------------")
+            #   return({'message':'Employee not found','image_path':image_path})
+            # print("Employee id is ---------------------------------------",employee_id)
+
+            # emp_exists = Employee.query.filter_by(emp_id = employee_id).first()
+            # today_record = Attendance.query.filter_by(emp_id=employee_id,date=datetime.now().date() ).first()
+
+
+
+            # attendance_entry_exit = Attendance(emp_id=employee_id)
+            # attendance_entry_exit.mark_entry_exit()
+            # if emp_exists:
+            #     if  today_record:
+            #         # today_record.status = status
+
+            #         db.session.commit()
+            #         return({'message':'Your exit time has been updated','image_path':image_path})
+
+            #     else:
+
+            #         return({'message':'Your attendance has been marked','image_path':image_path})
+
+            # else:
+            #     return({'message':'Employee not found','image_path':image_path})
+
+
+        return jsonify({'message': 'Image saved successfully','image_path':image_path}), 200
+    else:
+        return jsonify({'message': 'Invalid file type'}), 400
+
+@app.route('/recognize',methods=['POST'])
+@cross_origin()
+def recognize():
+    employee_id =  face_match('C:/Users/YashwanthSaiRamVanum/Pictures/Face-Recognition-frontend/src/assets/uploads/captured_image.jpg','C:/Users/YashwanthSaiRamVanum/Pictures/Face-Recognition-frontend/data.pt')
+    print("----------------------------employee ID is ::::::;",employee_id)
+    # employee_id = real_time_face_detection()
+    print(employee_id)
+    emp_name = Employee.query
+    if employee_id is None:
+      return jsonify({'messsage': 'emp_id and emp_name are required'}), 400
+    if employee_id == 'Unknown':
+      print("Inside if employee_id is unknown -------------------", employee_id)
+      return {'message':'Employee not found', 'emp_id': 'unknown'}
+    print("Employee id is ---------------------------------------",employee_id)
+
+    emp_exists = Employee.query.filter_by(emp_id = employee_id).first()
+    today_record = Attendance.query.filter_by(emp_id=employee_id,date=datetime.now().date() ).first()
+
+
+
+    attendance_entry_exit = Attendance(emp_id=employee_id)
+    attendance_entry_exit.mark_entry_exit()
+    if emp_exists:
+        if  today_record:
+            # today_record.status = status
+
+            db.session.commit()
+            empname = emp_exists.emp_name
+            print("emp_name i s==================",emp_exists)
+            return {'message':'Thank You.Your exit time has been updated','emp_id': empname}
+
+        else:
+            empname = emp_exists.emp_name
+            return {'message':'Thank You.Your attendance has been marked', 'emp_id': empname}
+
+    else:
+        return({'message':'Employee not found'})
+
+
+
+
+
+class Timeoff(db.Model):
+    timeoff_id = db.Column(db.Integer,primary_key = True,autoincrement = True)
+    emp_id = db.Column(db.String(100),nullable = False)
+    emp_name = db.Column(db.String(120),nullable = False)
+    timeoff = db.Column(db.String(120),nullable = False)
+    date = db.Column(db.DateTime,nullable = False)
+    dayoftheweek = db.Column(db.String(20),nullable = False)
+    type = db.Column(db.String(120),nullable = False)
+    unitoftime = db.Column(db.String(120),nullable = False)
+    comment = db.Column(db.String(120))
+
+    def serialize(self):
+        return {
+            'timeoff_id':self.timeoff_id,
+            'timeoff':self.timeoff,
+            'date':self.date,
+            'dayoftheweek':self.dayoftheweek,
+            'type':self.type,
+            'unitoftime':self.unitoftime,
+            'comment':self.comment
+        }
+
+@app.route('/timeoff/<int:emp_id>',methods = ['GET'])
+@cross_origin()
+def get_timeoff(emp_id):
+    timeoffs = Timeoff.query.filter_by(emp_id = emp_id).all()
+    return jsonify([i.serialize() for i in timeoffs])
+
+class holi(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    holiday_date = db.Column(db.String(255))
+    title = db.Column(db.String(255))
+
+    def __init__(self, holiday_date, title):
+        self.holiday_date = holiday_date
+        self.title = title
+
+with app.app_context():
+    db.create_all()
+    if not holi.query.filter_by(holiday_date='2024-01-01').first():
+      sample_data = [
+          holi(holiday_date='2024-01-01', title="New Year's Day"),
+          holi(holiday_date='2024-15-01', title="Sankranti / Pongal"),
+          holi(holiday_date='2024-26-01', title="Republic Day"),
+          holi(holiday_date='2024-18-02', title="Mahashivratri"),
+          holi(holiday_date='2024-07-04', title="Good Friday"),
+          holi(holiday_date='2024-22-04', title="Eid-Ul-Fitr"),
+          holi(holiday_date='2024-01-05', title="May Day"),
+          holi(holiday_date='2024-29-06', title="Bakra Id"),
+          holi(holiday_date='2024-15-08', title="Independence Day"),
+          holi(holiday_date='2024-19-09', title="Ganesh Chathurthi"),
+          holi(holiday_date='2024-02-10', title="Gandhi Jayanti"),
+          holi(holiday_date='2024-24-10', title="Dusshera"),
+          holi(holiday_date='2024-12-11', title="Diwali"),
+        #   holi(holiday_date='2024-13-11', title="Balipadyami Diwali / Govardhan Pooja"),
+          holi(holiday_date='2024-25-12', title="Christmas"),
+          ]
+
+      for data in sample_data:
+          db.session.add(data)
+
+      db.session.commit()
+
+@app.route('/holiday', methods=['GET'])
+def get_all_data():
+    data = holi.query.all()
+    data_list = []
+
+    for item in data:
+        data_list.append({
+            'id': item.id,
+            'date': item.holiday_date,
+            'title': item.title
+        })
+
+    return data_list
+
+
+
 
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
 
     # print(employee_id('abcd'))
-
-

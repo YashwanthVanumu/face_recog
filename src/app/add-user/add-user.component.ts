@@ -12,7 +12,7 @@ export class AddUserComponent {
   constructor(private router: Router) {}
   onsave(){
 
-    this.router.navigate(['/user']);
+    this.router.navigate(['/adduserform']);
     }
 
 }

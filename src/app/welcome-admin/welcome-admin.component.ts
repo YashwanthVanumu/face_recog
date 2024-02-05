@@ -1,68 +1,112 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { EmployeeserviceService } from '../employeeservice.service';
+import { MyserviceService } from '../myservice.service';
+
+interface employee {
+  value: string;
+  viewValue: string;
+  valueId: number;
+}
+
 
 @Component({
   selector: 'app-welcome-admin',
   templateUrl: './welcome-admin.component.html',
   styleUrls: ['./welcome-admin.component.css']
 })
-export class WelcomeAdminComponent {
-  arr: string = history.state.data;
-  bell_icon="&#x1F514";
-  employees!: number;
-  bell="../assets/bell_icon1.jpg";
-  boy_icon="../assets/user-icon.png";
+export class WelcomeAdminComponent implements OnInit{
+  bell_icon = "&#x1F514"
+  bell = "../assets/bell_icon1.jpg"
+  boy_icon = "../assets/user-icon.png"
   details: boolean = false;
-  constructor(private router: Router,private employeeService: EmployeeserviceService) {}
+  selectedLevel: any;
+  employees: employee[] = [];
+  emp_id!: number;
+  id: number = history.state.data;
+  username!: string;
+  email!: string;
+  values: any[] = []
+
+  constructor(private router: Router, private employeeService: EmployeeserviceService,
+    private myService: MyserviceService) { }
   ngOnInit(): void {
-    this.employeeService.getAllEmployee().subscribe((response) => {
-      this.employees = response.emp_id
-      console.log(response)
-      console.log(this.employees)
+    this.myService.get_admin_by_id(history.state.data).subscribe((response) => {
+      this.username = response.username,
+      this.email = response.email
+
     })
 
-    console.log("this is in welcome admin page",this.arr[0][0])
-  }
+    this.employeeService.getAllEmployee().subscribe((response) => {
+      this.values = response
+      console.log("admin_id is :",history.state.data)
 
-  onsave(){
-    this.arr = history.state.data
 
-  this.router.navigate(['/notification'],{state:{data:this.arr}});
-  }
-  onsave1(){
+      // this.datas = response,console.log(response.emp_name)
+      for (let i = 0; i < response.length; i++) {
+        this.emp_id = response[i].emp_id
+        console.log("emp_id is :",this.emp_id)
+        // this.employees.push(response[i].emp_name)
 
-    this.router.navigate(['/login']);
-    }
-    onsave2(){
+        this.employees.push( { value: response[i].emp_name, viewValue: response[i].emp_name , valueId: response[i].emp_id})
+        // console.log(response[i].emp_name)
+        // this.employees.push()
 
-      this.router.navigate(['/user']);
       }
-      onsave3(){
+     console.log(this.employees)
+      // console.log(typeof this.datas[0])
+      // console.log(this.datas[0])
+      // console.log(this.datas);
 
-        this.router.navigate(['/list_attendance']);
-        }
-        onsave4(){
+    })
 
-          this.router.navigate(['/attendance-management']);
-          }
-          showNotification() {
-            this.details = !this.details
-            if (this.details)
-            {
-              const admindetails = document.getElementById('admin-details') as HTMLDivElement;
-              admindetails.style.display = 'block';
-            }
-            else{
-              this.hideNotification();
-            }
 
-          }
-         hideNotification() {
-           // Hide the notification box
-           const admindetails = document.getElementById('admin-details') as HTMLDivElement;
-           admindetails.style.display = 'none';
-         }
-    
+  }
+
+
+  onsave() {
+
+
+    this.router.navigate(['/notification']);
+  }
+  onsave1() {
+    // console.log(this.datas[0])
+    this.router.navigate(['/login']);
+  }
+  onsave2() {
+
+    this.router.navigate(['/user']);
+  }
+  onsave3() {
+
+
+    this.router.navigate(['/list_attendance'],{state:{data: this.id}});
+  }
+  onsave4() {
+
+
+    this.router.navigate(['/attendance-management'],{state:{data: this.id}});
+  }
+  onsave5() {
+    // console.log(this.selectedLevel)
+    this.router.navigate(['/absence'],{state:{data: this.selectedLevel}});
+  }
+  showNotification() {
+    this.details = !this.details
+    if (this.details == true) {
+      const admindetails = document.getElementById('admin-details') as HTMLDivElement;
+      admindetails.style.display = 'block';
+    }
+    else {
+      this.hideNotification();
+    }
+
+  }
+  hideNotification() {
+    // Hide the notification box
+    const admindetails = document.getElementById('admin-details') as HTMLDivElement;
+    admindetails.style.display = 'none';
+  }
+
 
 }

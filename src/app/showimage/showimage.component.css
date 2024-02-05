@@ -1,0 +1,22 @@
+body{
+    height: 95vh;
+    width: 98vw;
+}
+.access{
+    position: relative;
+   font-size: 200px;
+   margin-left: 40rem;
+   margin-top: 20rem;
+}
+/* .icon{
+    position: relative;
+    border: 2px solid black;
+    height: 100px;
+    width: 100px;
+} */
+.message{
+    font-style: normal;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: 20;
+    margin-left: 40rem;
+}

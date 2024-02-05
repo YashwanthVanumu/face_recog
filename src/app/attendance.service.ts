@@ -33,4 +33,13 @@ export class AttendanceService {
   get_attendance_by_id(emp_id: number): Observable<any>{
     return this.http.get(`${this.Url}/${emp_id}`)
   }
+  postImage(imageData: FormData): Observable<any> {
+    const uploadUrl = `${this.Url}/upload_image`;
+    return this.http.post(uploadUrl, imageData);
+}
+recognize(data: any): Observable<any>{
+  const recognizeurl = "http://127.0.0.1:5000/recognize"
+  return this.http.post(recognizeurl,data)
+}
+
 }

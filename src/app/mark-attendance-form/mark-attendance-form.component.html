@@ -20,6 +20,7 @@
             <div *ngIf="message" class="alert alert-info mt-3">
               {{ message }}
             </div>
+
   
             <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </form>
@@ -27,6 +28,10 @@
     </div>
     <!-- <button type="submit" (click)="onsave1()"class="button">Redirect to face recognised</button> -->
   
-  
+  <div class="captured_image">
+    <img *ngIf="img" [src]="img" alt="Captured Image" />
+    <!-- <img src="{{url}}" alt=""> -->
+</div>
+
   
   </body>

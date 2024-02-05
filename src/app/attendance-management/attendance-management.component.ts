@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { MyserviceService } from '../myservice.service';
+import { AttendanceService } from '../attendance.service';
+import { DialogService } from '../dialog.service';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-attendance-management',
@@ -9,7 +13,37 @@ import { Router } from '@angular/router';
 export class AttendanceManagementComponent {
   boy_icon="../assets/user-icon.png"
   details: boolean = false;
-  constructor(private router: Router) {}
+  name!: string;
+  id!: number;
+  admin_id: number = history.state.data;
+  admin_name!: string;
+  email!: string;
+  status!: string;
+  successMessage$ = this.dialogService.successMessageAction$;
+  errorMessage$ = this.dialogService.errorMessageAction$;
+  constructor(private router: Router,private attendanceService: AttendanceService,
+    private dialogService: DialogService,private myService: MyserviceService) {}
+  ngOnInit(): void {
+    console.log("admin_id in am is :",this.admin_id)
+    this.myService.get_admin_by_id(history.state.data).subscribe((response) => {
+      this.admin_name = response.username,
+      this.email = response.email
+
+    })
+  }
+  onsave(){
+    console.log(this.status)
+    const datajson = {
+      'emp_name':this.name,
+      'emp_id':this.id,
+      'status':this.status
+    }
+    console.log("status in attendance-management",this.status)
+    this.attendanceService.post_attendance(datajson).pipe(tap(response => {
+      this.dialogService.setSuccessMessage(response.message)
+      console.log(datajson)
+    })).subscribe()
+  }
   onsave2(){
 
     this.router.navigate(['/login']);
@@ -31,5 +65,6 @@ export class AttendanceManagementComponent {
    const admindetails = document.getElementById('admin-details') as HTMLDivElement;
    admindetails.style.display = 'none';
  }
+
 
 }

@@ -10,38 +10,20 @@ import { EmployeeserviceService } from '../employeeservice.service';
 export class UserComponent {
   bell="../assets/bell.jpeg"
   boy_icon="../assets/user-icon.png"
-  employees: any = [];
-  emp_ids: number[] =[];
   details: boolean = false;
-  route: ActivatedRoute = inject(ActivatedRoute);
-    employeeid = -1;
-    constructor(private router: Router,private employeeService: EmployeeserviceService) {
-        this.employeeid = Number(this.route.snapshot.params['emp_id']);
-    }
+  employees: any = [];
+  constructor(private router: Router,private employeeService: EmployeeserviceService) {}
   ngOnInit(): void {
-    this.employeeService.getAllEmployee().subscribe((response) =>{
-      this.employees = response
-      console.log("emp_id is : ",this.employeeid)
-
-
-    })
+    this.employeeService.getAllEmployee().subscribe((response) => {this.employees =response})
   }
 
   onsave() {
-    this.employeeService.getAllEmployee().subscribe((response) => {
-      for (let i = 0; i <response.length; i++){
-        this.employeeService.getEmployeeById(response[i].emp_id).subscribe((response) => {
-          console.log(response)
-        })
-      }
-      //this.employeeService.getEmployeeById()
-    })
     // Perform your authentication logic here.
     // For simplicity, let's assume validation always succeeds.
     // In a real application, you'd check user credentials against a backend service.
 
     // Redirect to the home page upon successful login.
-    this.router.navigate(['/details'],{state:{data:this.emp_ids}});
+    this.router.navigate(['/details']);
   }
   onsave1(){
 
@@ -51,6 +33,11 @@ export class UserComponent {
 
       this.router.navigate(['/login']);
       }
+      onsave3(){
+
+        this.router.navigate(['/edit-details']);
+        }
+
     showNotification() {
       this.details = !this.details
       if (this.details == true)
@@ -61,7 +48,7 @@ export class UserComponent {
       else{
         this.hideNotification();
       }
-  
+
     }
    hideNotification() {
      // Hide the notification box

@@ -4,6 +4,7 @@ import { EmployeeserviceService } from '../employeeservice.service';
 import { AttendanceService } from '../attendance.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { HolidayService } from '../holiday.service';
 
 @Component({
   selector: 'app-welcome-employee',
@@ -25,11 +26,18 @@ formattedDay: number[]=[];
  formattedMonth: number[]=[];
  formattedYear: number[]=[];
  mysqldate: Date[]= [];
+ users!: number;
+ result!: [];
+ holidays:  any= [];
 
 
-  constructor(private router: Router,private employeeServie: EmployeeserviceService, private attendanceservice: AttendanceService, private cdr: ChangeDetectorRef) {}
-  users: number = history.state.data[0][1]
-  result: [] = history.state.data
+  constructor(private router: Router,private employeeServie: EmployeeserviceService, private attendanceservice: AttendanceService, private cdr: ChangeDetectorRef, private holidayservice: HolidayService) {
+    this.users = history.state.data[0]
+    this.result = history.state.data
+    console.log(this.users, this.result)
+  
+  }
+  
 
    navigationExtras: NavigationExtras = {
     queryParams: { id: this.emp_id },
@@ -37,6 +45,13 @@ formattedDay: number[]=[];
 
 
   ngOnInit(): void {
+    this.employeeServie.getEmployeeById(this.users).subscribe((data)=>{
+      this.employees = data;
+      console.log(this.employees)
+      console.log(this.employees.emp_id)
+      console.log(this.employees.emp_name)
+      console.log(typeof this.employees.emp_id)
+    })
      }
 
   // onsave2(){
@@ -64,15 +79,14 @@ formattedDay: number[]=[];
 
 onsave5(){
 
-  forkJoin([this.employeeServie.getEmployeeById(this.users), this.attendanceservice.get_attendance_by_id(this.users)]).subscribe(([data, attendanceresponse]) =>{
+   forkJoin([this.holidayservice.get_holiday(),this.attendanceservice.get_attendance_by_id(this.users)]).subscribe(([holidaydata,attendanceresponse]) =>{
 
       // this.emp_name = data.emp_name
       // this.emp_id = data.emp_id
       // console.log(this.result)
-      this.employees = data;
-      console.log(this.employees)
-      console.log(this.employees.emp_id)
-      console.log(typeof this.employees.emp_id)
+      console.log("Holdiay response is:",holidaydata)
+      this.holidays = holidaydata;
+      console.log(this.holidays)
       for (let i=0; i<attendanceresponse.length;i++)
       {
         this.emp_date.push(attendanceresponse[i].date);
@@ -101,10 +115,12 @@ onsave5(){
       }
       // this.attendancedetails.push(this.formattedDay, this.formattedDate, this.formattedMonth,this.formattedMonth)
       let attendancedetails ={
-          key1 : this.formattedDay,
+          key1: this.formattedDay,
           key2: this.formattedDate,
           key3: this.formattedMonth,
           key4: this.formattedYear,
+          key5: this.employees.emp_name,
+          key6: JSON.stringify(this.holidays),
       }
       console.log(this.formattedDate);
       console.log(this.formattedMonth);

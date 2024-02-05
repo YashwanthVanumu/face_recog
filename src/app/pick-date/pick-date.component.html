@@ -1,35 +1,35 @@
 <body>
   <nav>
-    
+
       <div class="nav-left">
         <!-- <img [src]="image" alt="Logo" class="logo2"> -->
     </div>
     <ul>
       <li><a  (click)="showNotification()"><img [src]="boy_icon" alt="Photo Icon" class="nav-icon">
         </a></li>
-       
-      
-      
+
+
+
       <!-- <li><a routerLink="/login">Logout</a></li> -->
     </ul>
   </nav>
       <div class="admin-container" id="admin-details">
-    
-        <p id="adminname">Employee</p>
-      <p id="adminemail">Employee@gmail.com</p>
-      <p id="adminemail">ID: 23456789</p>
 
-    
+        <p id="adminname">{{emp_name}}</p>
+      <p id="adminemail">{{email}}</p>
+      <p id="adminemail">ID: {{emp_id}}</p>
+
+
     <span class="Logout" (click)="onsave2()">Logout</span>
-        
+
         <!-- <span class="close-button" (click)="hideNotification()">✖</span> -->
       </div>
   <div class="container">
     <p class ="heading">Leave start date</p>
-    <input type="date" [min]="minDate">
-    <div class="line"></div> 
+    <input type="date" [min]="minDate" [(ngModel)]="startDate">
+    <div class="line"></div>
     <p class ="heading">Leave end date</p>
-    <input type="date" [min]="minDate">
+    <input type="date" [min]="minDate" [(ngModel)]="endDate">
     <div class="line"></div>
     <p class ="heading">Reason</p>
     <select [(ngModel)]="selectedLevel">
@@ -38,6 +38,6 @@
     </select>
     <div class="line"></div>
     <!-- <input type="text"> -->
-    <button type="button">save</button>
-  </div> 
+    <button type="button" (click)="onsave()">save</button>
+  </div>
 </body>

@@ -29,6 +29,10 @@ export class MyserviceService {
   getAdmins(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/admins`);
   }
+  get_admin_by_id(id: number): Observable<any>{
+    return this.http.get(`${this.apiUrl}/${id}`)
+  }
+
 
   getAdmin(adminId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admins/${adminId}`);

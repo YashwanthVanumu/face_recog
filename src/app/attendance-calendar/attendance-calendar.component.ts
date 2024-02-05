@@ -16,6 +16,8 @@ import { startOfYear, subYears } from 'date-fns';
 import { EmployeeserviceService } from '../employeeservice.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { AttendanceService } from '../attendance.service';
+import { DatePipe } from '@angular/common';
+import { HolidayService } from '../holiday.service';
 
 // const RED_CELL: 'red-cell' = 'red-cell';
 // const BLUE_CELL: 'blue-cell' = 'blue-cell';
@@ -73,9 +75,11 @@ export class FiveDayRangeSelectionStrategy<D> implements MatDateRangeSelectionSt
   templateUrl: './attendance-calendar.component.html',
   styleUrls: ['./attendance-calendar.component.css'],
   providers: [
+    DatePipe,
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
       useClass: FiveDayRangeSelectionStrategy,
+      
     },
   ],
 })
@@ -106,57 +110,61 @@ formattedDay: number[]=[];
  formattedYear: number[]=[];
  employeeid = -1;
  route: ActivatedRoute = inject(ActivatedRoute);
- body!: CalendarMonthViewDay[];
- mysqldate: Date[]= [];
- dataloaded = false;
  daydetails: any[] = [];
+ holidays: any = [];
+ holidaydetails: any = [];
+
 
 private getHardcodedHolidays(): CalendarEvent[] {
   // Hardcoded list of public holidays (example)
-  const holidays: CalendarEvent[] = [
-    {
-      start: new Date('2023-01-01'),
-      title: 'New Year\'s Day',
-      allDay: true,
-      meta: { type: 'public-holiday' },
-    },
-    {
-      start: new Date('2023-07-04'),
-      title: 'Independence Day',
-      allDay: true,
-      meta: { type: 'public-holiday' },
-    },
-    {
-      start: new Date('2023-12-25'),
-      title: 'Christmas',
-      allDay: true,
-      meta: { type: 'public-holiday' },
-    },
-    {
-      start: new Date('2023-11-12'),
-      title: 'diwali',
-      allDay: true,
-      meta: { type: 'public-holiday' },
-    },
-    {
-      start: new Date('2024-01-01'),
-      title: 'New Year\'s Day',
-      allDay: true,
-      meta: { type: 'public-holiday' },
-    },
-    // Add more holidays as needed
-  ];
-
-  return holidays;
+  const holidaysdate: CalendarEvent[] = [];
+  for (let i = 0; i < this.holidaydetails.length; i++) {
+    console.log(typeof this.holidaydetails[i].date)
+    holidaysdate.push({
+      start: new Date(this.holidaydetails[i].date),
+      title: this.holidaydetails[i].title,
+      // allDay: true,
+      // meta: { type: 'public-holiday' },
+    });
+  }
+  return holidaysdate;
 }
+   
+    // {
+    //   start: new Date('2023-07-04'),
+    //   title: 'Independence Day',
+    //   // allDay: true,
+    //   // meta: { type: 'public-holiday' },
+    // },
+    // {
+    //   start: new Date('2023-12-25'),
+    //   title: 'Christmas',
+    //   // allDay: true,
+    //   // meta: { type: 'public-holiday' },
+    // },
+    // {
+    //   start: new Date('2023-11-12'),
+    //   title: 'diwali',
+    //   // allDay: true,
+    //   // meta: { type: 'public-holiday' },
+    // },
+    // {
+    //   start: new Date('2024-01-01'),
+    //   title: 'New Year\'s Day',
+    //   // allDay: true,
+    //   // meta: { type: 'public-holiday' },
+    // },
+    // Add more holidays as needed
+
+  
 
 
   // events$!: Observable<CalendarEvent<{ film: Film; }>[]>;
 
   // activeDayIsOpen: boolean = false;
 
-  constructor(private router: Router, private employeeServie: EmployeeserviceService, private attendanceservice: AttendanceService, private cdr: ChangeDetectorRef ) {
-    this.events = this.getHardcodedHolidays();
+  constructor(private router: Router, private employeeServie: EmployeeserviceService, private attendanceservice: AttendanceService, private cdr: ChangeDetectorRef, private holidayservice: HolidayService, private datepipe: DatePipe ) {
+   
     
   }
   // users: number = history.state.data[0][1];
@@ -169,9 +177,16 @@ private getHardcodedHolidays(): CalendarEvent[] {
       this.formattedDate = params['key2'];
       this.formattedMonth = params['key3'];
       this.formattedYear = params['key4'];
+      this.emp_name = params['key5'];
+      this.holidays = JSON.parse(params['key6']);
       // Access more parameters as needed
-      console.log('Received data:', this.formattedDay, this.formattedDate, this.formattedMonth, this.formattedYear);
+      console.log('Received data:', this.formattedDay, this.formattedDate, this.formattedMonth, this.formattedYear, this.emp_id, this.holidays);
     });
+    this.holidaydetails = this.formatAndModifyDates(this.holidays);
+    console.log(this.holidaydetails);
+    this.events = this.getHardcodedHolidays();
+    console.log(this.events)
+   
   }
 
   beforeMonthViewRender({ body }: { body: CalendarMonthViewDay[] }): void {
@@ -218,6 +233,29 @@ private getHardcodedHolidays(): CalendarEvent[] {
    const admindetails = document.getElementById('admin-details') as HTMLDivElement;
    admindetails.style.display = 'none';
  }
+ 
+ formatAndModifyDates(originalData: any[]): any[] {
+  return originalData.map(item => {
+    // Clone the original object to avoid modifying it directly
+    const newItem = { ...item };
+    console.log(newItem)
+
+    // Check if the item has a 'date' property
+    if (newItem.date) {
+      // Parse the original date
+
+      // Use DatePipe to format the date in the desired format
+      // newItem.date = this.datepipe.transform(newItem.date, 'yyyy-MM-dd');
+      const [year, day, month] = newItem.date.split('-');
+
+    // Create a new date string with the desired format
+    newItem.date = `${year}-${month}-${day}`;
+      console.log(newItem.date);
+    }
+
+    return newItem;
+  });
+}
 
 
 

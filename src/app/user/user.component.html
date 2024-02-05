@@ -28,16 +28,31 @@
   <button class="add-button"(click)="onsave1()">Add Employee</button>
 
 
-  <table >
+  <table>
     <tr>
       <th class="heading">Employee</th>
       <!-- <th>Action</th> -->
     </tr>
     <tr *ngFor = "let employee of employees">
-      <td class="text" >{{employee.emp_name}}</td>
-      <a [routerLink]="['/details', employee.emp_id]">View</a>
+      <td class="text">{{employee.emp_name}}</td>
+      <td><a [routerLink]="['/details', employee.emp_id]">View</a></td>
+      <td><button class="edit-button1"(click)="onsave3()">Edit</button></td>
     </tr>
-
+    <tr>
+      <td class="text">Employee 2</td>
+      <td><button class="edit-button">View</button></td>
+      <td><button class="edit-button1">Edit</button></td>
+    </tr>
+    <tr>
+      <td class="text">Employee 3</td>
+      <td><button class="edit-button">View</button></td>
+      <td><button class="edit-button1"(click)="onsave()">Edit</button></td>
+    </tr>
+    <tr>
+      <td class="text">Employee 4</td>
+      <td><button class="edit-button">View</button></td>
+      <td><button class="edit-button1"(click)="onsave()">Edit</button></td>
+    </tr>
   </table>
 </div>
 </body>

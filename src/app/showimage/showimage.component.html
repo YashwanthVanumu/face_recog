@@ -1,0 +1,12 @@
+<body>
+<div *ngIf="access">
+<!-- <img [src]="img" alt="Captured Image" /> -->
+<i class="bi bi-x-circle access"></i>
+
+<p class="message1" #message>{{message1}}</p>
+</div>
+<div *ngIf="allow">
+<i class="bi bi-check-circle access"></i>
+<p class="message2" #message>{{message2}}</p>
+</div>
+</body>

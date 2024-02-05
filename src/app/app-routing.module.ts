@@ -23,6 +23,9 @@ import { ContactComponent } from './contact/contact.component';
 import { ThankYouComponent } from './thank-you/thank-you.component';
 import { MarkAttendanceFormComponent } from './mark-attendance-form/mark-attendance-form.component';
 import { MarkLeaveComponent } from './mark-leave/mark-leave.component';
+import { AdduserFormComponent } from './adduser-form/adduser-form.component';
+import { EditDetailsComponent } from './edit-details/edit-details.component';
+import { ShowimageComponent } from './showimage/showimage.component';
 const routes: Routes = [
   { path: '', redirectTo: '/attendance', pathMatch: 'full' },
   {path: 'attendance', component: AttendanceComponent},
@@ -31,7 +34,7 @@ const routes: Routes = [
   {path:'popup',component:PopupComponent},
   {path:'login',component:LoginComponent},
   {path:'user',component:UserComponent},
-  {path:'details',component:DetailsComponent},
+  {path:'details/:emp_id',component:DetailsComponent},
   {path:'add-user',component:AddUserComponent},
   {path:'welcome-admin',component:WelcomeAdminComponent},
   {path:'notification',component:NotificationComponent},
@@ -48,6 +51,9 @@ const routes: Routes = [
   {path:'thank-you', component: ThankYouComponent},
   {path:'mark-attendance-form', component: MarkAttendanceFormComponent},
   {path: 'mark-leave', component: MarkLeaveComponent},
+  {path: 'adduserform', component: AdduserFormComponent},
+  {path: 'edit-details', component: EditDetailsComponent},
+  {path: 'show-image', component: ShowimageComponent}
 
 ];
 
